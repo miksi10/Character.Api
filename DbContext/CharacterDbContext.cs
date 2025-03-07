@@ -25,7 +25,8 @@ namespace CharacterApi.DbContext
                 .WithMany(c => c.Characters)
                 .UsingEntity<CharacterItem>();
 
-
+            modelBuilder.Entity<Class>()
+                .HasIndex(c => c.Name).IsUnique(true);
         }
     }
 }

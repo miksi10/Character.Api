@@ -5,6 +5,7 @@ namespace CharacterApi.BusinessLogic.Models
 {
     public class CharacterPost
     {
+        [Required]
         public string Name { get; set; }
         public int Health { get; set; }
         public int Mana { get; set; }
@@ -12,6 +13,7 @@ namespace CharacterApi.BusinessLogic.Models
         public int BaseAgility { get; set; }
         public int BaseIntelligence { get; set; }
         public int BaseFaith { get; set; }
+        [Required]
         public ClassPost Class { get; set; }
         [MaxLength(450)]
         [SwaggerIgnore]
