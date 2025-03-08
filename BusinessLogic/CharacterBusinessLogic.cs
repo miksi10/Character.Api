@@ -7,16 +7,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CharacterApi.BusinessLogic
 {
+    /// <summary>
+    /// CharacterBusinessLogic for character manipulation
+    /// </summary>
     public class CharacterBusinessLogic : ICharacterBusinessLogic
     {
+        #region Private fields
         private readonly CharacterDbContext _characterDbContext;
         private readonly IMapper _mapper;
+        #endregion
+
+        #region Public constructor
         public CharacterBusinessLogic(CharacterDbContext characterDbContext, IMapper mapper)
         {
             _characterDbContext = characterDbContext;
             _mapper = mapper;
         }
+        #endregion
 
+        #region Public methods
         public CommandResponse<CharacterPost> CreateCharacter(CharacterPost characterPost)
         {
             var createCharacterResponse = new CommandResponse<CharacterPost>() { Data = characterPost };
@@ -105,5 +114,6 @@ namespace CharacterApi.BusinessLogic
             
             return getCharactersResponse;
         }
+        #endregion
     }
 }

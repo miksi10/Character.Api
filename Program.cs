@@ -11,6 +11,7 @@ builder.Services.AddDbContext<CharacterDbContext>(options =>
     options.UseSqlServer(@"Data Source=(localdb)\FirstLocalDB;Initial Catalog=CharacterDb;Integrated Security=True"));
 
 builder.Services.AddScoped<ICharacterBusinessLogic, CharacterBusinessLogic>();
+builder.Services.AddScoped<IItemBusinessLogic, ItemBusinessLogic>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
