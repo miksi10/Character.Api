@@ -46,6 +46,7 @@ namespace CharacterApi.Controllers
         /// <param name="id">Item id</param>
         /// <returns>Command response with item in data property</returns>
         [HttpGet("{id}")]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public ActionResult<CommandResponse<ItemGetById>> GetItem(int id)
         {
             var response = _itemBusinessLogic.GetItemById(id);
@@ -58,6 +59,7 @@ namespace CharacterApi.Controllers
         /// <param name="item">Item to insert</param>
         /// <returns>Command response with inserted item in data property</returns>
         [HttpPost]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public ActionResult<CommandResponse<ItemPost>> PostItem(ItemPost item)
         {
             var response = _itemBusinessLogic.CreateItem(item);
@@ -70,6 +72,7 @@ namespace CharacterApi.Controllers
         /// <param name="item">Item fod adding to specific character</param>
         /// <returns>Command response with added item to character</returns>
         [HttpPost(nameof(Grant))]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public ActionResult<CommandResponse<GrantItem>> Grant(GrantItem item)
         {
             var response = _itemBusinessLogic.AddItemToCharacter(item);
@@ -82,6 +85,7 @@ namespace CharacterApi.Controllers
         /// <param name="item">Item to gift from one character to another</param>
         /// <returns>Command response with gifted item</returns>
         [HttpPost(nameof(Gift))]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public ActionResult<CommandResponse<GrantItem>> Gift(GiftItemRequest item)
         {
             var response = _itemBusinessLogic.GiftItem(item);

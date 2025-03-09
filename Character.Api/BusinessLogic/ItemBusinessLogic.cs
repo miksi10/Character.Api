@@ -169,6 +169,7 @@ namespace CharacterApi.BusinessLogic
             }
             catch (Exception e)
             {
+                giftItemResponse.Data = null;
                 giftItemResponse.Success = false;
                 giftItemResponse.Message = new CommandMessage()
                 {
