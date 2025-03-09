@@ -4,7 +4,9 @@ using CharacterApi.BusinessLogic.Models;
 using CharacterApi.Models;
 using CharacterApi.Repository;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Moq;
+using System.Security.Claims;
 
 namespace Test
 {
@@ -15,11 +17,13 @@ namespace Test
         private readonly IMapper _mapper;
         private MapperConfiguration _config;
         private ICharacterBusinessLogic _characterBusinessLogic;
+        private Mock<IHttpContextAccessor> _contextAccessor;
         #endregion
         #region Public constructor
         public CharacterBusinessLogicTest()
         {
             _characterRepository = new Mock<ICharacterRepository>();
+            _contextAccessor = new Mock<IHttpContextAccessor>();
             _config = new MapperConfiguration(cfg => cfg.AddMaps(new[] { "Character.Api" }));
 
             _mapper = _config.CreateMapper();
@@ -32,7 +36,7 @@ namespace Test
         {
             //Arrange
             _characterRepository.Setup(cr => cr.GetCharacters()).Returns(GetCharactersResponse());
-            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object);
+            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object);
 
             //Act
             var response = _characterBusinessLogic.GetCharacters();
@@ -49,7 +53,7 @@ namespace Test
         {
             //Arrange
             _characterRepository.Setup(cr => cr.GetCharacters()).Throws(new Exception("Exception in character repository method GetCharacters"));
-            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object);
+            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object);
 
             //Act
             var response = _characterBusinessLogic.GetCharacters();
@@ -69,7 +73,7 @@ namespace Test
             //Arrange
             int id = 1;
             _characterRepository.Setup(cr => cr.GetCharacterById(It.IsAny<int>())).Returns(GetCharacterByIdResponse());
-            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object);
+            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object);
 
             //Act
             var response = _characterBusinessLogic.GetCharacterById(id);
@@ -87,7 +91,7 @@ namespace Test
             //Arrange
             int id = 2;
             _characterRepository.Setup(cr => cr.GetCharacterById(It.IsAny<int>())).Returns(GetCharacterByIdResponse(false));
-            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object);
+            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object);
 
             //Act
             var response = _characterBusinessLogic.GetCharacterById(id);
@@ -105,7 +109,7 @@ namespace Test
             //Arrange
             int id = 3;
             _characterRepository.Setup(cr => cr.GetCharacterById(It.IsAny<int>())).Throws(new Exception("Exception in character repository method GetCharacterById"));
-            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object);
+            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object);
 
             //Act
             var response = _characterBusinessLogic.GetCharacterById(id);
@@ -124,7 +128,11 @@ namespace Test
             //Arrange
             var characterPost = CreateCharacterRequest();
             _characterRepository.Setup(cr => cr.CreateCharacter(It.IsAny<Character>())).Returns(2);
-            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object);
+            _contextAccessor.Setup(h => h.HttpContext.User).Returns(new ClaimsPrincipal(
+                        new ClaimsIdentity(
+                            new Claim[] { new Claim(ClaimTypes.NameIdentifier, "Unit test") }
+                        )));
+            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object);
 
             //Act
             var response = _characterBusinessLogic.CreateCharacter(characterPost);
@@ -142,7 +150,11 @@ namespace Test
             //Arrange
             var characterPost = CreateCharacterRequest();
             _characterRepository.Setup(cr => cr.CreateCharacter(It.IsAny<Character>())).Returns(0);
-            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object);
+            _contextAccessor.Setup(h => h.HttpContext.User).Returns(new ClaimsPrincipal(
+                        new ClaimsIdentity(
+                            new Claim[] { new Claim(ClaimTypes.NameIdentifier, "Unit test") }
+                        )));
+            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object);
 
             //Act
             var response = _characterBusinessLogic.CreateCharacter(characterPost);
@@ -160,7 +172,11 @@ namespace Test
             //Arrange
             var characterPost = CreateCharacterRequest();
             _characterRepository.Setup(cr => cr.CreateCharacter(It.IsAny<Character>())).Throws(new Exception("Exception in character repository method CreateCharacter"));
-            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object);
+            _contextAccessor.Setup(h => h.HttpContext.User).Returns(new ClaimsPrincipal(
+                        new ClaimsIdentity(
+                            new Claim[] { new Claim(ClaimTypes.NameIdentifier, "Unit test") }
+                        )));
+            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object);
 
             //Act
             var response = _characterBusinessLogic.CreateCharacter(characterPost);
@@ -237,8 +253,7 @@ namespace Test
                 BaseAgility = 4,
                 BaseIntelligence = 5,
                 BaseFaith = 6,
-                Class = new ClassPost() { Name = "Unit test name", Description = "Unit test description"},
-                CreatedBy = "Unit test"
+                Class = new ClassPost() { Name = "Unit test name", Description = "Unit test description"}
             };
         }
         #endregion

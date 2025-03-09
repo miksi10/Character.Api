@@ -5,6 +5,7 @@ using CharacterApi.DbContext;
 using CharacterApi.Models;
 using CharacterApi.Repository;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
 namespace CharacterApi.BusinessLogic
 {
@@ -16,13 +17,15 @@ namespace CharacterApi.BusinessLogic
         #region Private fields
         private readonly IMapper _mapper;
         private readonly ICharacterRepository _characterRepository;
+        private readonly IHttpContextAccessor _contextAccessor;
         #endregion
 
         #region Public constructor
-        public CharacterBusinessLogic(IMapper mapper, ICharacterRepository characterRepository)
+        public CharacterBusinessLogic(IMapper mapper, ICharacterRepository characterRepository, IHttpContextAccessor contextAccessor)
         {
             _mapper = mapper;
             _characterRepository = characterRepository;
+            _contextAccessor = contextAccessor;
         }
         #endregion
 
@@ -33,6 +36,9 @@ namespace CharacterApi.BusinessLogic
 
             try
             {
+                //we need user id from user identity, to put it in createdBy parameter
+                characterPost.CreatedBy = _contextAccessor!.HttpContext!.User.FindFirst(x => x.Type == ClaimTypes.NameIdentifier)!.Value;
+
                 var character = _mapper.Map<Character>(characterPost);
 
                 int rows = _characterRepository.CreateCharacter(character);
