@@ -17,6 +17,7 @@ builder.Services.AddScoped<ICharacterBusinessLogic, CharacterBusinessLogic>();
 builder.Services.AddScoped<IItemBusinessLogic, ItemBusinessLogic>();
 
 builder.Services.AddScoped<ICharacterRepository, CharacterRepository>();
+builder.Services.AddScoped<IItemRepository, ItemRepository>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 

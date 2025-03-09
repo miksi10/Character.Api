@@ -111,7 +111,6 @@ namespace CharacterApi.BusinessLogic
                 var characters = _characterRepository.GetCharacters();
 
                 getCharactersResponse.Data = _mapper.Map<List<CharacterGet>>(characters);
-
             }
             catch (Exception ex)
             {

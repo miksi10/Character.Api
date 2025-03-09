@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
 using BusinessLogic.Models;
 using CharacterApi.BusinessLogic.Models;
-using CharacterApi.DbContext;
 using CharacterApi.Models;
-using Microsoft.EntityFrameworkCore;
+using CharacterApi.Repository;
 
 namespace CharacterApi.BusinessLogic
 {
@@ -14,15 +13,15 @@ namespace CharacterApi.BusinessLogic
     {
 
         #region Private fields
-        private readonly CharacterDbContext _characterDbContext;
+        private readonly IItemRepository _itemRepository;
         private readonly IMapper _mapper;
         #endregion
 
         #region Public constructors
-        public ItemBusinessLogic(CharacterDbContext characterDbContext, IMapper mapper)
+        public ItemBusinessLogic(IMapper mapper, IItemRepository itemRepository)
         {
-            _characterDbContext = characterDbContext;
             _mapper = mapper;
+            _itemRepository = itemRepository;
         }
 
         #endregion
@@ -34,7 +33,7 @@ namespace CharacterApi.BusinessLogic
 
             try
             {
-                var items = _characterDbContext.Items.ToList();
+                var items = _itemRepository.GetItems();
                 itemsResponse.Data = _mapper.Map<List<ItemGet>>(items);
             }
             catch (Exception ex)
@@ -58,12 +57,21 @@ namespace CharacterApi.BusinessLogic
             {
                 var item = _mapper.Map<Item>(itemPost);
 
-                _characterDbContext.Items.Add(item);
+                int rows = _itemRepository.CreateItem(item);
 
-                _characterDbContext.SaveChanges();
+                if(rows == 0)
+                {
+                    createItemResponse.Data = null;
+                    createItemResponse.Message = new CommandMessage()
+                    {
+                        Text = "Item is not created",
+                        Type = MessageType.Information.ToString()
+                    };
+                }
             }
             catch (Exception ex)
             {
+                createItemResponse.Data = null;
                 createItemResponse.Success = false;
                 createItemResponse.Message = new CommandMessage()
                 {
@@ -79,7 +87,7 @@ namespace CharacterApi.BusinessLogic
             var itemByIdResponse = new CommandResponse<ItemGetById>();
             try
             {
-                var item = _characterDbContext.Items.Find(id);
+                var item = _itemRepository.GetItemById(id);
 
                 if (item == null)
                 {
@@ -116,16 +124,25 @@ namespace CharacterApi.BusinessLogic
             {
                 var characterItem = _mapper.Map<CharacterItem>(grantItem);
 
-                _characterDbContext.CharacterItem.Add(characterItem);
+                int rows = _itemRepository.AddItemToCharacter(characterItem);
 
-                _characterDbContext.SaveChanges();
+                if(rows == 0)
+                {
+                    grantItemResponse.Data = null;
+                    grantItemResponse.Message = new CommandMessage()
+                    {
+                        Text = "Item is not added to character",
+                        Type = MessageType.Information.ToString()
+                    };
+                }
             }
             catch (Exception e)
             {
+                grantItemResponse.Data = null;
                 grantItemResponse.Success = false;
                 grantItemResponse.Message = new CommandMessage()
                 {
-                    Text = "Failed to create item",
+                    Text = "An error occured whilde adding item to character",
                     Type = MessageType.Error.ToString()
                 };
             }
@@ -138,16 +155,24 @@ namespace CharacterApi.BusinessLogic
 
             try
             {
-                var r = _characterDbContext.CharacterItem
-                    .Where(ci => (ci.ItemId == giftItem.GiftItemId && ci.CharacterId == giftItem.CharacterFromId))
-                    .ExecuteUpdate(ci => ci.SetProperty(c => c.CharacterId, c => giftItem.CharacterToId));
+                int rows = _itemRepository.GiftItem(giftItem);
+
+                if(rows == 0)
+                {
+                    giftItemResponse.Data = null;
+                    giftItemResponse.Message = new CommandMessage()
+                    {
+                        Text = "Item is not gifted to character",
+                        Type = MessageType.Information.ToString()
+                    };
+                }
             }
             catch (Exception e)
             {
                 giftItemResponse.Success = false;
                 giftItemResponse.Message = new CommandMessage()
                 {
-                    Text = String.Format("Failed to gift item with id {0} from character {1} to character with id {2}",
+                    Text = String.Format("An error occured while gifting item with id {0} from character {1} to character with id {2}",
                     giftItem.GiftItemId, giftItem.CharacterFromId, giftItem.CharacterToId),
                     Type = MessageType.Error.ToString()
                 };
