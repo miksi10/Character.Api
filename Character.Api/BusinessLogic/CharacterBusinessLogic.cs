@@ -3,6 +3,7 @@ using BusinessLogic.Models;
 using CharacterApi.BusinessLogic.Models;
 using CharacterApi.DbContext;
 using CharacterApi.Models;
+using CharacterApi.Repository;
 using Microsoft.EntityFrameworkCore;
 
 namespace CharacterApi.BusinessLogic
@@ -13,15 +14,15 @@ namespace CharacterApi.BusinessLogic
     public class CharacterBusinessLogic : ICharacterBusinessLogic
     {
         #region Private fields
-        private readonly CharacterDbContext _characterDbContext;
         private readonly IMapper _mapper;
+        private readonly ICharacterRepository _characterRepository;
         #endregion
 
         #region Public constructor
-        public CharacterBusinessLogic(CharacterDbContext characterDbContext, IMapper mapper)
+        public CharacterBusinessLogic(IMapper mapper, ICharacterRepository characterRepository)
         {
-            _characterDbContext = characterDbContext;
             _mapper = mapper;
+            _characterRepository = characterRepository;
         }
         #endregion
 
@@ -34,16 +35,25 @@ namespace CharacterApi.BusinessLogic
             {
                 var character = _mapper.Map<Character>(characterPost);
 
-                _characterDbContext.Character.Add(character);
+                int rows = _characterRepository.CreateCharacter(character);
 
-                _characterDbContext.SaveChanges();
+                if(rows == 0 )
+                {
+                    createCharacterResponse.Data = null;
+                    createCharacterResponse.Message = new CommandMessage()
+                    {
+                        Text = "Character is not created",
+                        Type = MessageType.Information.ToString()
+                    };
+                }
             }
             catch (Exception ex)
             {
+                createCharacterResponse.Data = null;
                 createCharacterResponse.Success = false;
                 createCharacterResponse.Message = new CommandMessage()
                 {
-                    Text = "Failed to create character",
+                    Text = "An error occured while creating character",
                     Type = MessageType.Error.ToString()
                 };
             }
@@ -57,7 +67,7 @@ namespace CharacterApi.BusinessLogic
 
             try
             {
-                var character = _characterDbContext.Character.Include(c => c.Items).FirstOrDefault(x => x.Id == id);
+                var character = _characterRepository.GetCharacterById(id);
 
                 if (character == null)
                 {
@@ -98,9 +108,10 @@ namespace CharacterApi.BusinessLogic
             var getCharactersResponse = new CommandResponse<List<CharacterGet>>();
             try
             {
-                var characters = _characterDbContext.Character.ToList();
+                var characters = _characterRepository.GetCharacters();
 
                 getCharactersResponse.Data = _mapper.Map<List<CharacterGet>>(characters);
+
             }
             catch (Exception ex)
             {

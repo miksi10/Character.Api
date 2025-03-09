@@ -1,6 +1,7 @@
 using CharacterApi.BusinessLogic;
 using CharacterApi.BusinessLogic.Mapper;
 using CharacterApi.DbContext;
+using CharacterApi.Repository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -14,6 +15,8 @@ builder.Services.AddDbContext<CharacterDbContext>(options =>
 
 builder.Services.AddScoped<ICharacterBusinessLogic, CharacterBusinessLogic>();
 builder.Services.AddScoped<IItemBusinessLogic, ItemBusinessLogic>();
+
+builder.Services.AddScoped<ICharacterRepository, CharacterRepository>();
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 

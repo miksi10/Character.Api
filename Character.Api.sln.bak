@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.12.35527.113
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Character.Api", "Character.Api\Character.Api.csproj", "{69EBEBCB-CCDB-49F0-BA31-05B9EA23F380}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{CBC2689A-C6A4-4837-A1FC-C9496159C09F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Character.Api", "Character.Api.csproj", "{69EBEBCB-CCDB-49F0-BA31-05B9EA23F380}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +15,6 @@ Global
 		{69EBEBCB-CCDB-49F0-BA31-05B9EA23F380}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{69EBEBCB-CCDB-49F0-BA31-05B9EA23F380}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{69EBEBCB-CCDB-49F0-BA31-05B9EA23F380}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CBC2689A-C6A4-4837-A1FC-C9496159C09F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CBC2689A-C6A4-4837-A1FC-C9496159C09F}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CBC2689A-C6A4-4837-A1FC-C9496159C09F}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CBC2689A-C6A4-4837-A1FC-C9496159C09F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
