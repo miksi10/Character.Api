@@ -2,6 +2,7 @@
 using CharacterApi.BusinessLogic;
 using CharacterApi.BusinessLogic.Models;
 using CharacterApi.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CharacterApi.Controllers
@@ -34,6 +35,7 @@ namespace CharacterApi.Controllers
         /// </summary>
         /// <returns>Command response with list of characters in data property</returns>
         [HttpGet]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "GameMaster")]
         public ActionResult<CommandResponse<List<CharacterGet>>> GetCharacter()
         {
             var response = _characterBusinessLogic.GetCharacters();

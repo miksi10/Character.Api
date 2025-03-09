@@ -1,6 +1,7 @@
 ﻿using BusinessLogic.Models;
 using CharacterApi.BusinessLogic;
 using CharacterApi.BusinessLogic.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CharacterApi.Controllers
@@ -32,6 +33,7 @@ namespace CharacterApi.Controllers
         /// </summary>
         /// <returns>Command response with all items in data property</returns>
         [HttpGet]
+        [Authorize(AuthenticationSchemes = "Bearer", Roles = "GameMaster")]
         public ActionResult<CommandResponse<List<ItemGet>>> GetItems()
         {
             var response = _itemBusinessLogic.GetItems();
