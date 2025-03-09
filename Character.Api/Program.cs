@@ -1,7 +1,10 @@
+using CharacterApi.Authorization;
 using CharacterApi.BusinessLogic;
 using CharacterApi.BusinessLogic.Mapper;
 using CharacterApi.DbContext;
 using CharacterApi.Repository;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -13,15 +16,22 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<CharacterDbContext>(options =>
     options.UseSqlServer(@"Data Source=(localdb)\FirstLocalDB;Initial Catalog=CharacterDb;Integrated Security=True"));
 
+builder.Services.AddHttpContextAccessor();
+
 builder.Services.AddScoped<ICharacterBusinessLogic, CharacterBusinessLogic>();
 builder.Services.AddScoped<IItemBusinessLogic, ItemBusinessLogic>();
 
 builder.Services.AddScoped<ICharacterRepository, CharacterRepository>();
 builder.Services.AddScoped<IItemRepository, ItemRepository>();
 
+builder.Services.AddScoped<IAuthorizationHandler, GameMasterOrCharacterOwnerRequirementHandler>();
+
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-builder.Services.AddAuthentication("Bearer").AddJwtBearer(options =>
+builder.Services.AddAuthentication(options => 
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
 {
     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
     {
@@ -31,6 +41,11 @@ builder.Services.AddAuthentication("Bearer").AddJwtBearer(options =>
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("afsdkjasjflxswafsdklk434orqiwup3457u-34oewir4irroqwiffv48mfs"))
     };
+});
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("GameMasterOrCharacterOwner", policy => policy.Requirements.Add(new GameMasterOrCharacterOwnerRequirement("GameMaster")));
 });
 
 builder.Services.AddControllers();

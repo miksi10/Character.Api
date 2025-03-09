@@ -24,6 +24,12 @@ namespace CharacterApi.Repository
             return _characterDbContext.Character.Include(c => c.Items).FirstOrDefault(x => x.Id == id);
         }
 
+        public string GetCharacterOwnerId(int id)
+        {
+            var characterOwner = _characterDbContext.Character.Where(ch => ch.Id == id).Select(ch => ch.CreatedBy).SingleOrDefault();
+            return characterOwner;
+        }
+
         public List<Character> GetCharacters()
         {
             return _characterDbContext.Character.ToList();

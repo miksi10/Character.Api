@@ -9,5 +9,7 @@ namespace CharacterApi.Repository
         Character GetCharacterById(int id);
 
         int CreateCharacter(Character character);
+
+        string GetCharacterOwnerId(int id);
     }
 }

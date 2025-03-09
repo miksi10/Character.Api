@@ -48,6 +48,7 @@ namespace CharacterApi.Controllers
         /// <param name="id">Character id</param>
         /// <returns>Command response with character in data property</returns>
         [HttpGet("{id}")]
+        [Authorize(AuthenticationSchemes = "Bearer", Policy = "GameMasterOrCharacterOwner")]
         public ActionResult<CharacterGetById> GetCharacter(int id)
         {
             var response = _characterBusinessLogic.GetCharacterById(id);
