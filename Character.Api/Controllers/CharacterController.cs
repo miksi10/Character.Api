@@ -62,7 +62,7 @@ namespace CharacterApi.Controllers
         /// <param name="character">Character to insert</param>
         /// <returns>Command response with inserted character in data property</returns>
         [HttpPost]
-        [Authorize(AuthenticationSchemes = "Bearer")]
+        [Authorize(AuthenticationSchemes = "Bearer", Policy = "ValidUser")]
         public ActionResult<Character> PostCharacter(CharacterPost character)
         {
             var response = _characterBusinessLogic.CreateCharacter(character);
