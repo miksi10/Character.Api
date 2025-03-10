@@ -1,10 +1,12 @@
 using AutoMapper;
+using Castle.Core.Logging;
 using CharacterApi.BusinessLogic;
 using CharacterApi.BusinessLogic.Models;
 using CharacterApi.Models;
 using CharacterApi.Repository;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Moq;
 using System.Security.Claims;
 
@@ -18,6 +20,7 @@ namespace Test
         private MapperConfiguration _config;
         private ICharacterBusinessLogic _characterBusinessLogic;
         private Mock<IHttpContextAccessor> _contextAccessor;
+        private Mock<ILogger<CharacterBusinessLogic>> _logger;
         #endregion
         #region Public constructor
         public CharacterBusinessLogicTest()
@@ -25,8 +28,8 @@ namespace Test
             _characterRepository = new Mock<ICharacterRepository>();
             _contextAccessor = new Mock<IHttpContextAccessor>();
             _config = new MapperConfiguration(cfg => cfg.AddMaps(new[] { "Character.Api" }));
-
             _mapper = _config.CreateMapper();
+            _logger = new Mock<ILogger<CharacterBusinessLogic>>(MockBehavior.Default);
         }
         #endregion
 
@@ -36,7 +39,7 @@ namespace Test
         {
             //Arrange
             _characterRepository.Setup(cr => cr.GetCharacters()).Returns(GetCharactersResponse());
-            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object);
+            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object, _logger.Object);
 
             //Act
             var response = _characterBusinessLogic.GetCharacters();
@@ -53,7 +56,7 @@ namespace Test
         {
             //Arrange
             _characterRepository.Setup(cr => cr.GetCharacters()).Throws(new Exception("Exception in character repository method GetCharacters"));
-            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object);
+            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object, _logger.Object);
 
             //Act
             var response = _characterBusinessLogic.GetCharacters();
@@ -73,7 +76,7 @@ namespace Test
             //Arrange
             int id = 1;
             _characterRepository.Setup(cr => cr.GetCharacterById(It.IsAny<int>())).Returns(GetCharacterByIdResponse());
-            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object);
+            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object, _logger.Object);
 
             //Act
             var response = _characterBusinessLogic.GetCharacterById(id);
@@ -91,7 +94,7 @@ namespace Test
             //Arrange
             int id = 2;
             _characterRepository.Setup(cr => cr.GetCharacterById(It.IsAny<int>())).Returns(GetCharacterByIdResponse(false));
-            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object);
+            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object, _logger.Object);
 
             //Act
             var response = _characterBusinessLogic.GetCharacterById(id);
@@ -109,7 +112,7 @@ namespace Test
             //Arrange
             int id = 3;
             _characterRepository.Setup(cr => cr.GetCharacterById(It.IsAny<int>())).Throws(new Exception("Exception in character repository method GetCharacterById"));
-            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object);
+            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object, _logger.Object);
 
             //Act
             var response = _characterBusinessLogic.GetCharacterById(id);
@@ -132,7 +135,7 @@ namespace Test
                         new ClaimsIdentity(
                             new Claim[] { new Claim(ClaimTypes.NameIdentifier, "Unit test") }
                         )));
-            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object);
+            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object, _logger.Object);
 
             //Act
             var response = _characterBusinessLogic.CreateCharacter(characterPost);
@@ -154,7 +157,7 @@ namespace Test
                         new ClaimsIdentity(
                             new Claim[] { new Claim(ClaimTypes.NameIdentifier, "Unit test") }
                         )));
-            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object);
+            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object, _logger.Object);
 
             //Act
             var response = _characterBusinessLogic.CreateCharacter(characterPost);
@@ -176,7 +179,7 @@ namespace Test
                         new ClaimsIdentity(
                             new Claim[] { new Claim(ClaimTypes.NameIdentifier, "Unit test") }
                         )));
-            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object);
+            _characterBusinessLogic = new CharacterBusinessLogic(_mapper, _characterRepository.Object, _contextAccessor.Object, _logger.Object);
 
             //Act
             var response = _characterBusinessLogic.CreateCharacter(characterPost);

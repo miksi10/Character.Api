@@ -4,6 +4,7 @@ using CharacterApi.BusinessLogic.Models;
 using CharacterApi.Models;
 using CharacterApi.Repository;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Moq;
 
 namespace Test
@@ -15,6 +16,7 @@ namespace Test
         private readonly IMapper _mapper;
         private MapperConfiguration _config;
         private IItemBusinessLogic _itemBusinessLogic;
+        private Mock<ILogger<ItemBusinessLogic>> _logger;
         #endregion
         #region Public Constructor
         public ItemBusinessLogicTest()
@@ -22,6 +24,7 @@ namespace Test
             _itemRepository = new Mock<IItemRepository>();
             _config = new MapperConfiguration(cfg => cfg.AddMaps(new[] { "Character.Api" }));
             _mapper = _config.CreateMapper();
+            _logger = new Mock<ILogger<ItemBusinessLogic>>(MockBehavior.Default);
         }
         #endregion
         #region GetItems tests
@@ -30,7 +33,7 @@ namespace Test
         {
             //Arrange
             _itemRepository.Setup(cr => cr.GetItems()).Returns(GetItemsResponse());
-            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object);
+            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object, _logger.Object);
 
             //Act
             var response = _itemBusinessLogic.GetItems();
@@ -47,7 +50,7 @@ namespace Test
         {
             //Arrange
             _itemRepository.Setup(cr => cr.GetItems()).Throws(new Exception("Repository method GetItems throws exception"));
-            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object);
+            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object, _logger.Object);
 
             //Act
             var response = _itemBusinessLogic.GetItems();
@@ -66,7 +69,7 @@ namespace Test
             //Arrange
             int id = 1;
             _itemRepository.Setup(cr => cr.GetItemById(It.IsAny<int>())).Returns(GetItemByIdResponse());
-            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object);
+            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object, _logger.Object);
 
             //Act
             var response = _itemBusinessLogic.GetItemById(id);
@@ -84,7 +87,7 @@ namespace Test
             //Arrange
             int id = 1;
             _itemRepository.Setup(cr => cr.GetItemById(It.IsAny<int>())).Returns(GetItemByIdResponse(false));
-            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object);
+            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object, _logger.Object);
 
             //Act
             var response = _itemBusinessLogic.GetItemById(id);
@@ -102,7 +105,7 @@ namespace Test
             //Arrange
             int id = 1;
             _itemRepository.Setup(cr => cr.GetItemById(It.IsAny<int>())).Throws(new Exception("Repository method GetItemById throws exception"));
-            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object);
+            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object, _logger.Object);
 
             //Act
             var response = _itemBusinessLogic.GetItemById(id);
@@ -121,7 +124,7 @@ namespace Test
             //Arrange
             var itemCreate = CreateItemRequest();
             _itemRepository.Setup(cr => cr.CreateItem(It.IsAny<Item>())).Returns(1);
-            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object);
+            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object, _logger.Object);
 
             //Act
             var response = _itemBusinessLogic.CreateItem(itemCreate);
@@ -139,7 +142,7 @@ namespace Test
             //Arrange
             var itemCreate = CreateItemRequest();
             _itemRepository.Setup(cr => cr.CreateItem(It.IsAny<Item>())).Returns(0);
-            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object);
+            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object, _logger.Object);
 
             //Act
             var response = _itemBusinessLogic.CreateItem(itemCreate);
@@ -157,7 +160,7 @@ namespace Test
             //Arrange
             var itemCreate = CreateItemRequest();
             _itemRepository.Setup(cr => cr.CreateItem(It.IsAny<Item>())).Throws(new Exception("Repository method CreateItem throws exception"));
-            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object);
+            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object, _logger.Object);
 
             //Act
             var response = _itemBusinessLogic.CreateItem(itemCreate);
@@ -176,7 +179,7 @@ namespace Test
             //Arrange
             var addItemToCharacter = CreateAddItemToCharacterRequest();
             _itemRepository.Setup(cr => cr.AddItemToCharacter(It.IsAny<CharacterItem>())).Returns(1);
-            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object);
+            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object, _logger.Object);
 
             //Act
             var response = _itemBusinessLogic.AddItemToCharacter(addItemToCharacter);
@@ -194,7 +197,7 @@ namespace Test
             //Arrange
             var addItemToCharacter = CreateAddItemToCharacterRequest();
             _itemRepository.Setup(cr => cr.AddItemToCharacter(It.IsAny<CharacterItem>())).Returns(0);
-            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object);
+            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object, _logger.Object);
 
             //Act
             var response = _itemBusinessLogic.AddItemToCharacter(addItemToCharacter);
@@ -212,7 +215,7 @@ namespace Test
             //Arrange
             var addItemToCharacter = CreateAddItemToCharacterRequest();
             _itemRepository.Setup(cr => cr.AddItemToCharacter(It.IsAny<CharacterItem>())).Throws(new Exception("Repository method AddItemToCharacter throws exception"));
-            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object);
+            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object, _logger.Object);
 
             //Act
             var response = _itemBusinessLogic.AddItemToCharacter(addItemToCharacter);
@@ -231,7 +234,7 @@ namespace Test
             //Arrange
             var giftItemRequest = CreateGiftItemRequest();
             _itemRepository.Setup(cr => cr.GiftItem(It.IsAny<GiftItemRequest>())).Returns(1);
-            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object);
+            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object, _logger.Object);
 
             //Act
             var response = _itemBusinessLogic.GiftItem(giftItemRequest);
@@ -249,7 +252,7 @@ namespace Test
             //Arrange
             var giftItemRequest = CreateGiftItemRequest();
             _itemRepository.Setup(cr => cr.GiftItem(It.IsAny<GiftItemRequest>())).Returns(0);
-            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object);
+            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object, _logger.Object);
 
             //Act
             var response = _itemBusinessLogic.GiftItem(giftItemRequest);
@@ -267,7 +270,7 @@ namespace Test
             //Arrange
             var giftItemRequest = CreateGiftItemRequest();
             _itemRepository.Setup(cr => cr.GiftItem(It.IsAny<GiftItemRequest>())).Throws(new Exception("Repository method GiftItem throws exception"));
-            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object);
+            _itemBusinessLogic = new ItemBusinessLogic(_mapper, _itemRepository.Object, _logger.Object);
 
             //Act
             var response = _itemBusinessLogic.GiftItem(giftItemRequest);

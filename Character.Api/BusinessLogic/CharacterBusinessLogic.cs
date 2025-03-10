@@ -18,14 +18,16 @@ namespace CharacterApi.BusinessLogic
         private readonly IMapper _mapper;
         private readonly ICharacterRepository _characterRepository;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly ILogger<CharacterBusinessLogic> _logger;
         #endregion
 
         #region Public constructor
-        public CharacterBusinessLogic(IMapper mapper, ICharacterRepository characterRepository, IHttpContextAccessor contextAccessor)
+        public CharacterBusinessLogic(IMapper mapper, ICharacterRepository characterRepository, IHttpContextAccessor contextAccessor, ILogger<CharacterBusinessLogic> logger)
         {
             _mapper = mapper;
             _characterRepository = characterRepository;
             _contextAccessor = contextAccessor;
+            _logger = logger;
         }
         #endregion
 
@@ -62,6 +64,7 @@ namespace CharacterApi.BusinessLogic
                     Text = "An error occured while creating character",
                     Type = MessageType.Error.ToString()
                 };
+                _logger.LogError(ex, "[CharacterBusinessLogic] - CreateCharacter failed : {@characterPost}", characterPost);
             }
 
             return createCharacterResponse;
@@ -104,6 +107,7 @@ namespace CharacterApi.BusinessLogic
                     Text = "Failed to find character with id: " + id,
                     Type = MessageType.Error.ToString()
                 };
+                _logger.LogError(ex, "[CharacterBusinessLogic] - GetCharacterById failed : {@id}", id);
             }
 
             return getCharacterByIdResponse;
@@ -126,6 +130,7 @@ namespace CharacterApi.BusinessLogic
                     Text = "Failed to show all characters",
                     Type = MessageType.Error.ToString()
                 };
+                _logger.LogError(ex, "[CharacterBusinessLogic] - GetCharacters failed");
             }
             
             return getCharactersResponse;

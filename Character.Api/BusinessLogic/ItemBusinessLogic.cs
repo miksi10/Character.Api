@@ -3,6 +3,7 @@ using BusinessLogic.Models;
 using CharacterApi.BusinessLogic.Models;
 using CharacterApi.Models;
 using CharacterApi.Repository;
+using NuGet.DependencyResolver;
 
 namespace CharacterApi.BusinessLogic
 {
@@ -15,13 +16,15 @@ namespace CharacterApi.BusinessLogic
         #region Private fields
         private readonly IItemRepository _itemRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<ItemBusinessLogic> _logger;
         #endregion
 
         #region Public constructors
-        public ItemBusinessLogic(IMapper mapper, IItemRepository itemRepository)
+        public ItemBusinessLogic(IMapper mapper, IItemRepository itemRepository, ILogger<ItemBusinessLogic> logger)
         {
             _mapper = mapper;
             _itemRepository = itemRepository;
+            _logger = logger;
         }
 
         #endregion
@@ -44,10 +47,10 @@ namespace CharacterApi.BusinessLogic
                     Text = "Failed to show all items",
                     Type = MessageType.Error.ToString()
                 };
+                _logger.LogError(ex, "[ItemBusinessLogic] - GetItems failed");
             }
             return itemsResponse;
         }
-
 
         public CommandResponse<ItemPost> CreateItem(ItemPost itemPost)
         {
@@ -78,6 +81,7 @@ namespace CharacterApi.BusinessLogic
                     Text = "Failed to create item",
                     Type = MessageType.Error.ToString()
                 };
+                _logger.LogError(ex, "[ItemBusinessLogic] - CreateItem failed : {@itemPost}", itemPost);
             }
             return createItemResponse;
         }
@@ -112,6 +116,7 @@ namespace CharacterApi.BusinessLogic
                     Text = "Failed to find item with id: " + id,
                     Type = MessageType.Error.ToString()
                 };
+                _logger.LogError(ex, "[ItemBusinessLogic] - GetItemById failed : {@id}", id);
             }
             return itemByIdResponse;
         }
@@ -136,7 +141,7 @@ namespace CharacterApi.BusinessLogic
                     };
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 grantItemResponse.Data = null;
                 grantItemResponse.Success = false;
@@ -145,6 +150,7 @@ namespace CharacterApi.BusinessLogic
                     Text = "An error occured whilde adding item to character",
                     Type = MessageType.Error.ToString()
                 };
+                _logger.LogError(ex, "[ItemBusinessLogic] - AddItemToCharacter failed : {@grantItem}", grantItem);
             }
             return grantItemResponse;
         }
@@ -167,7 +173,7 @@ namespace CharacterApi.BusinessLogic
                     };
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
                 giftItemResponse.Data = null;
                 giftItemResponse.Success = false;
@@ -177,6 +183,7 @@ namespace CharacterApi.BusinessLogic
                     giftItem.GiftItemId, giftItem.CharacterFromId, giftItem.CharacterToId),
                     Type = MessageType.Error.ToString()
                 };
+                _logger.LogError(ex, "[ItemBusinessLogic] - GiftItem failed : {@giftItem}", giftItem);
             }
             return giftItemResponse;
         }
