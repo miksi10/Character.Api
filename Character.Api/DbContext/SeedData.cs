@@ -15,9 +15,13 @@ namespace CharacterApi.DbContext
 
                     if (context != null)
                     {
+                        //context.Database.EnsureDeleted();
                         context.Database.Migrate();
                     }
 
+                    //some test character
+                    //if already exists, code will go to catch block because test character is already inserted
+                    //Api will be started normally, even if that happens
                     var character = new Character()
                     {
                         Name = "firstCharacter",
@@ -39,7 +43,7 @@ namespace CharacterApi.DbContext
                                 BonusIntelligence = 0,
                             }
                         },
-                        CreatedBy = "5af697c9-ad4f-4658-b5c9-207173613dc8"
+                        CreatedBy = "5af697c9-ad4f-4658-b5c9-207173613dc8" //probably not valid user id, can be used for testing authorization based on valid user id in token
                     };
 
                     context.Character.Add(character);

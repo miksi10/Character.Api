@@ -76,7 +76,7 @@ builder.Host.UseSerilog((context, configuration) =>
 var app = builder.Build();
 
 //Creatinh DB scheme and insert some demo data
-//SeedData.EnsureSeedData(app);
+SeedData.EnsureSeedData(app);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
